@@ -1,0 +1,17 @@
+{
+    "name": "GrindBots",
+    "version": "1.0",
+    "mf_version": ">=0.1.0b2",
+    "description": "Плагин для гриндилки ресурсов у ботов.",
+    "author": "flexyyy",
+    "tags": [
+        "grind",
+        "bots",
+        "iris",
+        "bot",
+        "bfg",
+        "bfgproject",
+        "bforgame_bot"
+    ],
+    "repository": "empty link"
+}
