@@ -47,6 +47,8 @@ class GrindBots(loads.Module):
             if isinstance(param, Client):
                 if self._config['iris_farma']['activated']:
                     self.timer.add_job(self.__send_farma_iris__, trigger=DateTrigger(datetime.strptime(self._config['iris_farma']['next_request_date'], '%Y %m %d %H %M %S')), args=(param,), id='iris_farma')
+                if self._config['skrework_promo']['activated']:
+                    self.timer.add_job(self.__send_parse_sk__, DateTrigger(datetime.strptime(self._config['skrework_promo']['next_request_date'])), (param,), id='skrework_promo')
 
     @loads.func(filters.command('irisfarma', ['/', '.', '!']) & filters.me, description='фарм i¢ у @iris_moon_bot')
     async def iris_farma(self, app: Client, message: types.Message):
@@ -94,14 +96,10 @@ class GrindBots(loads.Module):
                 _job.reschedule(DateTrigger(datetime.now() + timedelta(seconds=total_seconds)))
     
     async def __send_farma_iris__(self, app: Client):
-        _job: Job = self.timer.get_job('iris_farma')
         
         try:
             await app.send_message('@iris_moon_bot', 'Фарма')
         except PeerIdInvalid:
-            if _job is not None:
-                _job.pause()
-            
             self._config['iris_farma']['activated'] = False
 
             return await app.send_message('me', '```GrindBots\nНе возможно написать боту @iris_moon_bot\nНачните с ним диалог и вызовите команду /irisfarma.```', parse_mode=enums.ParseMode.MARKDOWN)
@@ -110,8 +108,7 @@ class GrindBots(loads.Module):
 
         self._config['iris_farma']['next_request_date'] = new_date.strftime('%Y %m %d %H %M %S')
 
-        _job.reschedule(DateTrigger(datetime.now() + timedelta(hours=4)))
-        _job.resume()
+        self.timer.add_job(self.__send_farma_iris__, (DateTrigger(datetime.now() + timedelta(hours=4))), args=(app,), id='iris_farma')
 
     async def __get_msg_id_sk__(self, app: Client, msg_id: int=-1) -> Optional[types.Message]:
         if msg_id != -1:
@@ -172,13 +169,13 @@ class GrindBots(loads.Module):
 
         self._config['skrework_promo']['next_request_date'] = dtime.strftime('%Y %m %d %H %M %S')
             
-        _job: Job = self.timer.get_job('skrework_promo')
-        
-        _job.reschedule(DateTrigger(dtime))
-        _job.resume()
+        self.timer.add_job(self.__send_parse_sk__, DateTrigger(dtime), args=(app,), id='skrework_promo')
     
     @loads.func(filters.user('@ReworkStarsBot') & filters.private & filters.chat())
     async def parse_message_from_sk(self, app: Client, message: types.Message):
+        if not self._config['skrework_promo']['activated']:
+            return
+
         if message.text.startswith('⛔️ Промокод уже получен.\n⏱️ Следующий будет доступен через: '):
             hours = re.search(r'(\d+)ч', message.text)
             minutes = re.search(r'(\d+)м', message.text)
