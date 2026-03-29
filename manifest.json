@@ -1,6 +1,6 @@
 {
     "name": "GrindBots",
-    "version": "1.0",
+    "version": "1.1",
     "mf_version": ">=0.1.0b2",
     "description": "Плагин для гриндилки ресурсов у ботов.",
     "author": "flexyyy",
