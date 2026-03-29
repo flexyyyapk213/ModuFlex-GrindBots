@@ -48,7 +48,7 @@ class GrindBots(loads.Module):
                 if self._config['iris_farma']['activated']:
                     self.timer.add_job(self.__send_farma_iris__, trigger=DateTrigger(datetime.strptime(self._config['iris_farma']['next_request_date'], '%Y %m %d %H %M %S')), args=(param,), id='iris_farma')
                 if self._config['skrework_promo']['activated']:
-                    self.timer.add_job(self.__send_parse_sk__, DateTrigger(datetime.strptime(self._config['skrework_promo']['next_request_date'])), (param,), id='skrework_promo')
+                    self.timer.add_job(self.__send_parse_sk__, DateTrigger(datetime.strptime(self._config['skrework_promo']['next_request_date'], '%Y %m %d %H %M %S')), (param,), id='skrework_promo')
 
     @loads.func(filters.command('irisfarma', ['/', '.', '!']) & filters.me, description='фарм i¢ у @iris_moon_bot')
     async def iris_farma(self, app: Client, message: types.Message):
